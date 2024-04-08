@@ -29,7 +29,7 @@ const registerUser = asyncHandler(async (req,res) => {
     let coverImageLocalPath;
     //  if we pass nothing in coverImage ?. operator will give undefined error.
     if(req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0){
-        coverImageLocalPath = req.files?.coverImage[0]?.path
+        coverImageLocalPath = req.files.coverImage[0].path
     }
 
     // step 5 : upload them to cloudinary, avatar check
