@@ -10,7 +10,9 @@ const generateAccessAndRefreshToken = async (userId) => {
     try {
         const user = await User.findById(userId);
         const accessToken = user.generateAccessToken();
+        // console.log("accessToken : ", accessToken);
         const refreshToken = user.generateRefreshToken();
+        // console.log("refreshToken : ", refreshToken);
 
         user.refreshToken = refreshToken;
         await user.save({ validateBeforeSave: false });
@@ -90,7 +92,7 @@ const loginUser = asyncHandler(async (req, res) => {
     let { username, email, password } = req.body;
 
     // validation
-    if (!(username || !email)) {
+    if (!(username || email)) {
         throw new ApiError(400, "Invalid username or email");
     }
 
