@@ -231,4 +231,33 @@ const getCurrentUser = asyncHandler(async (req,res) => {
             )
 })
 
+const changeUserDetails = asyncHandler(async (req,res) => {
+    let {fullname, email} = req.body;
+
+    if(!fullname || !email){
+        throw new ApiError(400, "Invalid Input");
+    }
+
+    const user = await User.findByIdAndUpdate(
+        req.user._id, 
+        {
+            $set : {
+                fullname,
+                email
+            },
+        },
+        {
+            new : true,
+        }
+    ).select("-password")
+
+    res.status(200).json(
+        new ApiResponse(
+            200,
+            user,
+            "Details updated sucessfully"
+        )
+    )
+})
+
 export { registerUser, loginUser, logoutUser, refreshAccessToken, changePassword, getCurrentUser };
