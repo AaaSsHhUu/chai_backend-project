@@ -231,7 +231,7 @@ const getCurrentUser = asyncHandler(async (req,res) => {
             )
 })
 
-const changeUserDetails = asyncHandler(async (req,res) => {
+const updateUserDetails = asyncHandler(async (req,res) => {
     let {fullname, email} = req.body;
 
     if(!fullname || !email){
@@ -260,4 +260,67 @@ const changeUserDetails = asyncHandler(async (req,res) => {
     )
 })
 
-export { registerUser, loginUser, logoutUser, refreshAccessToken, changePassword, getCurrentUser };
+const updateUserAvatar = asyncHandler(async (req,res) => {
+    let avatarLocalPath = req.file?.path;
+
+    if(!avatarLocalPath){
+        throw new ApiError(400, "Avatar File is missing")
+    }
+    
+    let avatar = await uploadOnCloudinary(avatarLocalPath);
+    
+    if(!avatar.url){
+        throw new ApiError(500, "Error occured while uploading avatar on cloudinary")
+    }
+    
+    const updatedUser = await User.findByIdAndUpdate(
+        req.user._id,
+        {
+            $set : {avatar : avatar.url}
+        },
+        {
+            new : true
+        }
+    ).select("-password")
+    
+
+    res.status(200).json(
+        new ApiResponse(200,updatedUser,"Avatar Updated successfully")
+    )
+})
+
+const updatedUserCoverImage = asyncHandler(async (req,res) => {
+    const coverImageLocalPath = req.file?.path;
+
+    if(!coverImageLocalPath){
+        throw new ApiError(400, "Cover image file is missing");
+    }
+
+    const coverImage = await uploadOnCloudinary(coverImageLocalPath);
+
+    if(!coverImage.url){
+        throw new ApiError(500, "Error occured while uploading coverImage on cloudinary");
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+        req.user._id,
+        {
+            $set : {
+                coverImage : coverImage.url
+            }
+        },
+        {
+            new : true
+        }
+    ).select("-password")
+
+    res.status(200).json(
+        new ApiResponse(
+            200,
+            updatedUser,
+            "Cover image updated successfully"
+        )
+    )
+})
+
+export { registerUser, loginUser, logoutUser, refreshAccessToken, changePassword, getCurrentUser, updateUserAvatar, updatedUserCoverImage };
